@@ -2,9 +2,10 @@ import cv2
 import mediapipe as mp
 import pyautogui as p
 import time
+import math
+import pyautogui as p
 
 
-# cont=0
 def check_gesture(hand_landmarks):
     thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
     index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
@@ -12,6 +13,16 @@ def check_gesture(hand_landmarks):
     ring_tip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP]
     pinky_tip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP]
     wrist=hand_landmarks.landmark[mp_hands.HandLandmark.WRIST]
+
+    ring_pip=hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP]
+    pinky_pip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP]
+    index_pip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP]
+    middle_pip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP]
+
+    ring_mcp=hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_MCP]
+
+
+
 
     # for play and pause
     distances = [
@@ -21,16 +32,30 @@ def check_gesture(hand_landmarks):
         abs(wrist.y - pinky_tip.y),
         ]
     if all(i > 0.3 for i in distances) :
-        p.hotkey('space')
+        p.hotkey('k')
         time.sleep(1.5)
 
     # for volume control
-    if abs(thumb_tip.y- index_tip.y) > 0.2  and middle_tip.y > index_tip.y:
+    v_distance=math.hypot(thumb_tip.x-ring_mcp.x,thumb_tip.y-ring_mcp.y)
+    if abs(thumb_tip.y- index_tip.y) > 0.2  and middle_tip.y > index_tip.y and v_distance > 0.12:
         p.press('volumeup')
-        
-        
-    if 0.01< abs(thumb_tip.y- index_tip.y) < 0.2   and middle_tip.y > index_tip.y and thumb_tip.y > index_tip.y:
+    if 0.01< abs(thumb_tip.y- index_tip.y) < 0.2   and middle_tip.y > index_tip.y and thumb_tip.y > index_tip.y and  v_distance > 0.12:
         p.press('volumedown')
+        
+    # mouse_cursur and click
+    screen_width, screen_height = p.size()
+    cur_disantace=math.hypot(index_tip.x-middle_tip.x,index_tip.y-middle_tip.y)
+    if ring_tip.y>ring_pip.y and pinky_tip.y > pinky_pip.y and  index_pip.y > index_tip.y and middle_pip.y > middle_tip.y:
+        if cur_disantace>0.1:
+            x=middle_tip.x*screen_width*2
+            y=middle_tip.y*screen_height*2
+            p.moveTo(x, y)
+         
+        if cur_disantace >0.03 and cur_disantace < 0.06:
+            p.click(clicks=2, interval=0.25)
+            print("click")
+
+    
         
 
    
