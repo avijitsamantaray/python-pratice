@@ -460,7 +460,7 @@ if __name__ == "__main__":
     if os.path.isdir(""):
         pass
     else:
-        os.makedirs("testing")
+        os.makedirs("")
     os.chdir("")
     main()
 
